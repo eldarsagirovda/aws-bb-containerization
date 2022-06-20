@@ -2,7 +2,7 @@ spec:
   destination:
     server: https://kubernetes.default.svc
   source:
-    repoURL: https://github.com/eldarsagirovda/aws-bb-containerization.git
+    repoURL: https://github.com/eldarsagirovda/aws-bb-containerization
     targetRevision: main
   ingress:
     host: dev.example.com

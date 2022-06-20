@@ -176,6 +176,10 @@ module "eks_blueprints_kubernetes_addons" {
     }
   }
 
+  karpenter_helm_config = {
+    version = "0.11.1"
+  }
+
   tags = local.tags
 
   depends_on = [module.eks_blueprints.self_managed_node_groups]
