@@ -16,7 +16,7 @@ spec:
     path: apps/helm/shippingservice
     helm:
       parameters:
-        - name: image.tag
+        - name: spec.image.tag
           value: { { .Values.spec.image.tag } }
   syncPolicy:
     automated:
