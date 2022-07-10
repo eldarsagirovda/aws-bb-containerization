@@ -15,9 +15,11 @@ pipeline {
     agent any
     stages {
         stage('Prepare') {
-            script {
-                appList.each   {
-                    aws ecr describe-repositories --repository-names esagirov-aws-bb/${it} || aws ecr create-repository --repository-name esagirov-aws-bb/${it}
+            steps {
+                script {
+                    appList.each   {
+                        aws ecr describe-repositories --repository-names esagirov-aws-bb/${it} || aws ecr create-repository --repository-name esagirov-aws-bb/${it}
+                    }
                 }
             }
             
