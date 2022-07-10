@@ -135,13 +135,13 @@ module "eks_blueprints" {
         "environment" = var.environment
       }
       "quota" = {
-        "requests.cpu"    = "1000m",
-        "requests.memory" = "4Gi",
-        "limits.cpu"      = "2000m",
-        "limits.memory"   = "8Gi",
-        "pods"            = "10",
-        "secrets"         = "10",
-        "services"        = "10"
+        "requests.cpu"    = "10000m",
+        "requests.memory" = "40Gi",
+        "limits.cpu"      = "20000m",
+        "limits.memory"   = "80Gi",
+        "pods"            = "100",
+        "secrets"         = "100",
+        "services"        = "100"
       }
 
       #manifests_dir = "./manifests-team-red"
