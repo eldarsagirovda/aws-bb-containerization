@@ -8,7 +8,8 @@ def appList = [
     "loadgenerator",
     "paymentservice",
     "productcatalogservice",
-    "recommendationser",
+    "recommendationservice",
+    "shippingservice"
 ]
 
 pipeline {
