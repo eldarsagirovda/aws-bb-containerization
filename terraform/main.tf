@@ -61,9 +61,6 @@ locals {
   }
 }
 
-#---------------------------------------------------------------
-# EKS Blueprints
-#---------------------------------------------------------------
 module "eks_blueprints" {
   source = "github.com/aws-ia/terraform-aws-eks-blueprints?ref=v4.0.9"
 
@@ -73,6 +70,7 @@ module "eks_blueprints" {
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
 
+
   node_security_group_additional_rules = {
     ingress_nodes_karpenter_port = {
       description                   = "Cluster API to Nodegroup for Karpenter"
@@ -81,16 +79,38 @@ module "eks_blueprints" {
       to_port                       = 8443
       type                          = "ingress"
       source_cluster_security_group = true
-    }
+    },
+    all_cluster_internal = {
+      description                   = "Cluster API to Nodegroup for Karpenter"
+      protocol                      = "-1"
+      from_port                     = 0
+      to_port                       = 0
+      type                          = "ingress"
+      source_cluster_security_group = true
+    },
+    all_nodes_internal = {
+      description = "Cluster API to Nodegroup for Karpenter"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    },
+    all_cluster_outbound = {
+      description = "Cluster API to Nodegroup for Karpenter"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "egress"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+
   }
 
-  # Add karpenter.sh/discovery tag so that we can use this as securityGroupSelector in karpenter provisioner
   node_security_group_tags = {
     "karpenter.sh/discovery/${local.name}" = local.name
   }
 
-  # Self-managed Node Group
-  # Karpenter requires one node to get up and running
   self_managed_node_groups = {
     self_mg_t3 = {
       node_group_name    = local.node_group_name
@@ -156,19 +176,19 @@ module "eks_blueprints" {
 module "eks_blueprints_kubernetes_addons" {
   source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.0.9"
 
-  eks_cluster_id           = module.eks_blueprints.eks_cluster_id
-  eks_cluster_endpoint     = module.eks_blueprints.eks_cluster_endpoint
-  eks_oidc_provider        = module.eks_blueprints.oidc_provider
-  eks_cluster_version      = module.eks_blueprints.eks_cluster_version
-  auto_scaling_group_names = module.eks_blueprints.self_managed_node_group_autoscaling_groups
+  eks_cluster_id       = module.eks_blueprints.eks_cluster_id
+  eks_cluster_endpoint = module.eks_blueprints.eks_cluster_endpoint
+  eks_oidc_provider    = module.eks_blueprints.oidc_provider
+  eks_cluster_version  = module.eks_blueprints.eks_cluster_version
 
-  enable_argocd                        = true
-  enable_karpenter                     = true
-  enable_aws_node_termination_handler  = true
-  enable_aws_load_balancer_controller  = true
-  amazon_eks_aws_ebs_csi_driver_config = true
-
+  enable_argocd         = true
+  argocd_manage_add_ons = true # Indicates that ArgoCD is responsible for managing/deploying add-ons
   argocd_applications = {
+    addons = {
+      path               = "chart"
+      repo_url           = "https://github.com/aws-samples/eks-blueprints-add-ons.git"
+      add_on_application = true
+    }
     workloads = {
       path               = "envs/dev"
       repo_url           = "https://github.com/eldarsagirovda/aws-bb-containerization.git"
@@ -176,17 +196,24 @@ module "eks_blueprints_kubernetes_addons" {
     }
   }
 
-  karpenter_helm_config = {
-    version = "0.11.1"
-  }
+  # Add-ons
+  #enable_cluster_autoscaler = true
+  enable_karpenter                     = true
+  enable_metrics_server                = true
+  enable_prometheus                    = true
+  enable_vpa                           = true
+  enable_argo_rollouts                 = true
+  enable_aws_node_termination_handler  = true
+  enable_aws_load_balancer_controller  = true
+  amazon_eks_aws_ebs_csi_driver_config = true
 
   tags = local.tags
 
-  depends_on = [module.eks_blueprints.self_managed_node_groups]
 }
 
-# Creates Launch templates for Karpenter
-# Launch template outputs will be used in Karpenter Provisioners yaml files. Checkout this examples/karpenter/provisioners/default_provisioner_with_launch_templates.yaml
+
+# # Creates Launch templates for Karpenter
+# # Launch template outputs will be used in Karpenter Provisioners yaml files. Checkout this examples/karpenter/provisioners/default_provisioner_with_launch_templates.yaml
 module "karpenter_launch_templates" {
   source = "./modules/launch-templates"
 
@@ -226,7 +253,7 @@ module "karpenter_launch_templates" {
   tags = merge(local.tags, { Name = "karpenter" })
 }
 
-# Deploying default provisioner for Karpenter autoscaler
+# # Deploying default provisioner for Karpenter autoscaler
 data "kubectl_path_documents" "karpenter_provisioners" {
   pattern = "${path.module}/provisioners/default_provisioner.yaml"
   vars = {
