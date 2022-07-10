@@ -59,7 +59,7 @@ service:
   ports:
   - name: grpc
     port: 7070
-    targetPort: 70705
+    targetPort: 7070
 
 ingress:
   enabled: false
