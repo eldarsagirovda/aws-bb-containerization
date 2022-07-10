@@ -4,5 +4,5 @@ spec:
   source:
     repoURL: https://github.com/eldarsagirovda/aws-bb-containerization
     targetRevision: main
-  ingress:
-    host: dev.example.com
+  image:
+    tag: 10
