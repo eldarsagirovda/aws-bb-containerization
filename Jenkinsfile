@@ -28,7 +28,12 @@ pipeline {
             steps { 
                 script {
                     appList.each {
-                        dir("apps/src/${it}") {
+                        if (it == "cartservice") {
+                            appPath = "apps/src/${it}/src"
+                        } else {
+                            appPath = "apps/src/${it}"
+                        }
+                        dir("${appPath}") {
                             sh "docker build . -t 589295909756.dkr.ecr.eu-west-1.amazonaws.com/esagirov-aws-bb/${it}:${BUILD_NUMBER}"
                         }
                     }
