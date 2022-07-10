@@ -9,15 +9,15 @@ spec:
   project: default
   destination:
     namespace: team-eshop
-    server: { { .Values.spec.destination.server } }
+    server: {{ .Values.spec.destination.server }}
   source:
-    repoURL: { { .Values.spec.source.repoURL } }
-    targetRevision: { { .Values.spec.source.targetRevision } }
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
     path: apps/helm/shippingservice
     helm:
       parameters:
-        - name: spec.image.tag
-          value: { { .Values.spec.image.tag } }
+        - name: image.tag
+          value: {{ .Values.spec.image.tag }}
   syncPolicy:
     automated:
       prune: true
