@@ -5,7 +5,7 @@
 replicaCount: 3
 
 image:
-  repository: gcr.io/google-samples/microservices-demo/emailservice
+  repository: 589295909756.dkr.ecr.eu-west-1.amazonaws.com/esagirov-aws-bb/emailservice
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v0.3.8"
