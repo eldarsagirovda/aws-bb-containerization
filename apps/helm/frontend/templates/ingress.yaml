@@ -16,4 +16,4 @@ spec:
             service:
               name: {{ include "microservice.fullname" . }}
               port:
-                number: {{ .Values.service.ports[0].port }}
+                number: 80
