@@ -5,4 +5,4 @@ spec:
     repoURL: https://github.com/eldarsagirovda/aws-bb-containerization
     targetRevision: main
   image:
-    tag: 10
+    tag: "10"
