@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: { { .Values.spec.source.repoURL } }
     targetRevision: { { .Values.spec.source.targetRevision } }
-    path: apps/helm
+    path: apps/helm/checkoutservice
     helm:
       parameters:
         - name: image.tag
