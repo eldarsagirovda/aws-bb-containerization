@@ -1,0 +1,27 @@
+pipeline {
+    parameters {
+      booleanParam(name: 'write_file', defaultValue: true, description: 'Toggle this value')
+    }
+    agent any
+    stages {
+        stage('Prepare') {
+            when {
+                expression { params.write_file }
+            }
+            steps {
+                script {
+                    sh "echo 'test' > ./testfile"
+                }
+            }
+            
+        }
+        stage('Sleep') {
+            steps {
+                script {
+                    sh "sleep 300"
+                }
+            }
+            
+        }
+    }
+}
